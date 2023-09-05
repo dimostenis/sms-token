@@ -22,7 +22,7 @@ If any is a **NO**, it will not work for you.
     - How to set it: __System Settings__ ➡ __Privacy & Security__ ➡ __Full Disk Access__
     - Test it. This command shall return some SMS(s):
         ```sh
-        make test-db
+        📟 make test-db
         ```
 
 ## 3. Usage
