@@ -2,6 +2,7 @@ package token
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -29,12 +30,12 @@ func inject_stdin(s string) {
 
 func read_stdin() string {
 	// check if there is any data available to read from standard input
-	stat, _ := os.Stdin.Stat()
-	size := stat.Size()
-	if size == 0 {
-		fmt.Println("No stdin (SMS) recieved. Arent you running it directly without '-install' first?")
-		os.Exit(1)
-	}
+	// stat, _ := os.Stdin.Stat()
+	// size := stat.Size()
+	// if size == 0 {
+	// 	fmt.Println("No stdin (SMS) recieved. Arent you running it directly without '-install' first?")
+	// 	os.Exit(1)
+	// }
 
 	// scan stdin from sqlite3 cli
 	scanner := bufio.NewScanner(os.Stdin)
@@ -93,7 +94,6 @@ func get_age(ts int) int {
 }
 
 func get_sms() string {
-	var sms string
 	if debug := os.Getenv("DEBUG"); debug != "" {
 		println("DEBUG MODE ON, reading fake SMS")
 		if microsoft := os.Getenv("MICROSOFT"); microsoft != "" {
@@ -105,7 +105,26 @@ func get_sms() string {
 			os.Exit(1)
 		}
 	}
-	sms = read_stdin()
+
+	// run func read_stdin() for 1 second or it times out
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel() // executes after end of func
+
+	var sms string
+	result := make(chan int)
+	go func() {
+		sms = read_stdin()
+		result <- 0
+	}()
+
+	select {
+	case <-ctx.Done():
+		fmt.Println("No stdin (SMS) recieved for 1 sec. Arent you running it directly without '-install' first?")
+		os.Exit(1)
+	case <-result:
+		// good, we have sms text
+	}
+
 	return sms
 }
 
@@ -129,6 +148,12 @@ func GetToken() {
 	// token age in seconds
 	age := get_age(ts)
 
+	// tokens older than 10 mins are useless
+	if age > 10*60 {
+		fmt.Printf(" :: token is too old, try again")
+		os.Exit(0)
+	}
+
 	var unit_name string
 	var unit_num int
 	if age == 1 {
@@ -141,13 +166,6 @@ func GetToken() {
 		unit_num = age * 60
 		unit_name = "minutes"
 	}
-
-	// tokens older than 10 mins are useless
-	if age > 10*60 {
-		fmt.Printf(" :: token is too old (%d %s), try again", unit_num, unit_name)
-		os.Exit(0)
-	}
-
 	copy_to_clipboard(token)
 	fmt.Printf(" :: token '%s' copied to clipboard (%d %s old)", token, unit_num, unit_name)
 }
