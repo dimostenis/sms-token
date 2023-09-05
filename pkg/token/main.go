@@ -166,6 +166,6 @@ func GetToken() {
 		unit_num = age * 60
 		unit_name = "minutes"
 	}
-	copy_to_clipboard(token)
+	copy_to_clipboard(token + "\n")
 	fmt.Printf(" :: token '%s' copied to clipboard (%d %s old)", token, unit_num, unit_name)
 }
