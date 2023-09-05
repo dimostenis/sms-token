@@ -1,0 +1,5 @@
+# IDE
+.vscode
+
+# generated shell script with absolute paths
+bin/*
