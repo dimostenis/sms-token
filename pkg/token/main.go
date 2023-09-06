@@ -29,14 +29,6 @@ func inject_stdin(s string) {
 }
 
 func read_stdin() string {
-	// check if there is any data available to read from standard input
-	// stat, _ := os.Stdin.Stat()
-	// size := stat.Size()
-	// if size == 0 {
-	// 	fmt.Println("No stdin (SMS) recieved. Arent you running it directly without '-install' first?")
-	// 	os.Exit(1)
-	// }
-
 	// scan stdin from sqlite3 cli
 	scanner := bufio.NewScanner(os.Stdin)
 
