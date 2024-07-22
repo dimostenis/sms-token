@@ -1,16 +1,16 @@
-package token
+package sms
 
 import "strings"
 
 // string which must be present in SMS text so we know to use this particular extractor
-const MICROSOFT string = "Microsoft authentication"
+const Microsoft string = "Microsoft authentication"
 
-func extract_microsoft_sms(token_msg string) (string, int) {
+func extractMicrosoftSms(token_msg string) (string, int) {
 	// sample sms:
 	// Use verification code 123456 for Microsoft authentication.
 
 	var token string
-	var ts int
+	var ts_str string
 	words := strings.Fields(token_msg)
 	for i, word := range words {
 		// get token
@@ -20,9 +20,8 @@ func extract_microsoft_sms(token_msg string) (string, int) {
 
 		// get message timestamp
 		if word == "date" {
-			ts_str := words[i+2]
-			ts = str_to_int(ts_str)
+			ts_str = words[i+2]
 		}
 	}
-	return token, ts
+	return token, strToInt(ts_str)
 }
