@@ -12,7 +12,7 @@ import (
 // this is default path to system-wide executable
 const symlink string = "/usr/local/bin/token"
 
-var repo_path string = get_repo_path()
+var repoPath string = getRepoPath()
 
 type Arch string
 
@@ -21,7 +21,7 @@ const (
 	AMD64 Arch = "amd64"
 )
 
-func get_repo_path() string {
+func getRepoPath() string {
 	p, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -30,11 +30,11 @@ func get_repo_path() string {
 	return p
 }
 
-func get_script_content() string {
+func getScriptContent() string {
 	shebang := "#!/bin/zsh"
-	script_dir := repo_path + "/bin"
-	script_name := fmt.Sprintf("/token-%s-darwin", get_arch())
-	script := path.Join(script_dir, script_name)
+	scriptDir := repoPath + "/bin"
+	scriptName := fmt.Sprintf("/token-%s-darwin", getArch())
+	script := path.Join(scriptDir, scriptName)
 	qry := "sqlite3 -line ~/Library/Messages/chat.db \"SELECT m.text, m.date FROM message m WHERE text LIKE '%code%' ORDER BY m.ROWID DESC LIMIT 1\""
 	content := fmt.Sprintf("%s\n%s | %s\n", shebang, qry, script)
 	return content
@@ -52,29 +52,29 @@ func mkdir(path string) {
 	}
 }
 
-func write_file(script_path string, content string) {
+func writeFile(scriptPath string, content string) {
 	// prep parent directory, which may not be pushed in repo
-	dir, _ := path.Split(script_path)
+	dir, _ := path.Split(scriptPath)
 	mkdir(dir)
 
 	// write file
-	err := os.WriteFile(script_path, []byte(content), 0644)
+	err := os.WriteFile(scriptPath, []byte(content), 0644)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func create_symlink(source_file string, target_file string) {
+func createSymlink(sourceFile string, targetFile string) {
 	// create symbolic link to file (its not executable)
-	err := os.Symlink(source_file, target_file)
+	err := os.Symlink(sourceFile, targetFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func make_file_executable(target_file string) {
+func makeFileExecutable(target_file string) {
 	// make the symbolic link executable
 	err := os.Chmod(target_file, 0755)
 	if err != nil {
@@ -83,7 +83,7 @@ func make_file_executable(target_file string) {
 	}
 }
 
-func get_arch() Arch {
+func getArch() Arch {
 	if runtime.GOARCH == "arm64" {
 		return ARM64
 	} else {
@@ -91,7 +91,7 @@ func get_arch() Arch {
 	}
 }
 
-func delete_file(path string) {
+func deleteFile(path string) {
 	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		// nothing to do
@@ -104,23 +104,23 @@ func delete_file(path string) {
 
 func CreateSymlink() {
 	// find script path
-	script_path := path.Join(repo_path, "bin/token")
+	scriptPath := path.Join(repoPath, "bin/token")
 
 	// get shell script content
-	script_content := get_script_content()
+	scriptContent := getScriptContent()
 
 	// write script
-	write_file(script_path, script_content)
+	writeFile(scriptPath, scriptContent)
 
 	// create symlink so its system-wide
-	create_symlink(script_path, symlink)
-	make_file_executable(symlink)
+	createSymlink(scriptPath, symlink)
+	makeFileExecutable(symlink)
 
 	fmt.Printf("Symlink '%s' created\n", symlink)
 }
 
 func DeleteSymlink() {
-	delete_file(symlink)
+	deleteFile(symlink)
 
 	fmt.Printf("Symlink '%s' deleted\n", symlink)
 }

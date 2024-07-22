@@ -1,11 +1,11 @@
-package token
+package sms
 
 import "strings"
 
 // string which must be present in SMS text so we know to use this particular extractor
-const OTHER string = "text = Token code:"
+const Other string = "text = Token code:"
 
-func extract_other_sms(token_msg string) (string, int) {
+func extractOtherSms(token_msg string) (string, int) {
 	// sample sms:
 	// Token code: 123456
 
@@ -16,12 +16,11 @@ func extract_other_sms(token_msg string) (string, int) {
 
 	// get message timestamp
 	words := strings.Fields(token_msg)
-	var ts int
+	var ts_str string
 	for i, word := range words {
 		if word == "date" {
-			ts_str := words[i+2]
-			ts = str_to_int(ts_str)
+			ts_str = words[i+2]
 		}
 	}
-	return token, ts
+	return token, strToInt(ts_str)
 }

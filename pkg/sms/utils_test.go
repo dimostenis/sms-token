@@ -1,23 +1,8 @@
-package token
+package sms
 
 import "testing"
 
-func Test_read_stdin_ok(t *testing.T) {
-	// my custom stdin
-	const my_stdin string = "test input"
-
-	inject_stdin(my_stdin)
-
-	// call the function that reads from stdin
-	result := read_stdin()
-
-	// check if the result is correct
-	if result != my_stdin {
-		t.Errorf("read_stdin() = %q, want %s", result, my_stdin)
-	}
-}
-
-func Test_str_to_int(t *testing.T) {
+func TestStrToInt(t *testing.T) {
 	type args struct {
 		s string
 	}
@@ -44,7 +29,7 @@ func Test_str_to_int(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := str_to_int(tt.args.s); got != tt.want {
+			if got := strToInt(tt.args.s); got != tt.want {
 				t.Errorf("str_to_int() = %v, want %v", got, tt.want)
 			}
 		})
