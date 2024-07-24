@@ -121,7 +121,8 @@ func (s *Sms) getAgeFromTimestamp() error {
 
 func (s *Sms) checkAge(secs int) error {
 	if s.age > secs {
-		return errors.New(" :: Token is too old, try again.")
+		msg := fmt.Sprintf(" :: Token is too old (%d minutes), try again.", s.age/60)
+		return errors.New(msg)
 	}
 	return nil
 }
